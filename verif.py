@@ -1,9 +1,17 @@
 import re
 
 # Fonction pour vérifier le format du premier champ
-def verifier_format(champ):
+def verifier_format_champ1(champ):
     # Utilisation d'une expression régulière pour vérifier le format
     if re.match(r'\d+Kg', champ):
+        return True
+    else:
+        return False
+
+# Fonction pour vérifier le format du deuxième champ
+def verifier_format_champ2(champ):
+    # Utilisation de str.format() pour vérifier le format
+    if re.match(r'\d+-m', champ):
         return True
     else:
         return False
@@ -28,22 +36,31 @@ with open(fichier_sortie, 'w') as f_out:
         f_out.write('<td style="font-weight:bold; color:blue;">{}</td>'.format(champ.strip()))
     f_out.write('</tr>\n')
 
-    # Parcourir chaque ligne du fichier à partir de la deuxième ligne
+    # Parcourir chaque ligne du fichier à partir de la deuxième ligne jusqu'à la dernière
     for ligne in lignes[1:]:
         # Séparer les champs en utilisant le séparateur |
         champs = ligne.split('|')
-        # Vérifier le format du premier champ
-        if not verifier_format(champs[0]):
-            # Champ mal formaté, écrire en rouge dans le fichier de sortie
-            f_out.write('<tr><td style="color: red;">{}</td>'.format(champs[0]))
-            for champ in champs[1:]:
-                f_out.write('<td>{}</td>'.format(champ.strip()))
+        ligne_erreur = False
+        # Vérifier le format de chaque champ
+        for i, champ in enumerate(champs):
+            champ = champ.strip()
+            if i == 0:
+                if not verifier_format_champ1(champ):
+                    ligne_erreur = True
+                    champs[i] = '<span style="color:red;">{}</span>'.format(champ)
+            elif i == 1:
+                if not verifier_format_champ2(champ):
+                    ligne_erreur = True
+                    champs[i] = '<span style="color:red;">{}</span>'.format(champ)
+        if ligne_erreur:
+            f_out.write('<tr>')
+            for champ in champs:
+                f_out.write('<td>{}</td>'.format(champ))
             f_out.write('</tr>\n')
         else:
-            # Écrire la ligne normalement dans le fichier de sortie
-            f_out.write('<tr><td>{}</td>'.format(champs[0]))
-            for champ in champs[1:]:
-                f_out.write('<td>{}</td>'.format(champ.strip()))
+            f_out.write('<tr>')
+            for champ in champs:
+                f_out.write('<td>{}</td>'.format(champ))
             f_out.write('</tr>\n')
     # Écrire la fin du fichier HTML
     f_out.write('</table>\n</body>\n</html>')
