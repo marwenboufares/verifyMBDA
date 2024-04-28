@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import re
 
 # Fonction pour vérifier le format du premier champ

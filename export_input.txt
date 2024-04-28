@@ -1,0 +1,5 @@
+poids|hauteur|largeur
+32Kg|2-m|1m
+5Kg|25-m|12m
+0Kg|12-m|1m
+154g|1548225-m|1m
