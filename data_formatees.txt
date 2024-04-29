@@ -1,4 +1,0 @@
-poids|hauteaur|largeur|
-32Kg|2m|1m|
-[5[|25m|12m|
-[Kg[|2m|1m|
