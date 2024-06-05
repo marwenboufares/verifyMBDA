@@ -24,38 +24,53 @@ def verifier_format_champ3(champ):
         return False
 
 # Fonction pour vérifier le format du 11eme champ "Unité par défaut"
-#def verifier_format_champ12(champ):
-#    if re.match(r'^litre(s)$', champ):
-#        return True
-#    else:
-#        return False
-
 def verifier_format_champ12(champ):
-
     valeurs_acceptees = [
         "kilogramme",
         "kilogramme(s)",
-        "mètre",
-        "mètre(s)",
+        "metre",
+        "metre(s)",
         "litre",
         "litre(s)",
-        "mètre cube",
-        "unité",
+        "metre cube",
+        "unite",
         "unite(s)"
     ]
     return champ in valeurs_acceptees
 
 # Nom du fichier d'entrée et de sortie
 fichier_entree = 'export_input.txt'
+fichier_entree_corrige = 'export_input_corrige.txt'
 fichier_sortie = 'export_output.html'
+
+# Liste des remplacements à effectuer
+remplacements = [
+    ("unit�", "unite"),
+    ("m�tre", "metre"),
+    ("contr�l�", "controle"),
+    ("Publi�", "Publie")
+    # Ajouter d'autres remplacements si nécessaire
+]
+
+# Lire le contenu du fichier d'entrée
+with open(fichier_entree, 'r', encoding='utf-8') as f_in:
+    contenu = f_in.read()
+
+# Effectuer les remplacements
+for incorrect, correct in remplacements:
+    contenu = contenu.replace(incorrect, correct)
+
+# Sauvegarder le contenu corrigé dans un nouveau fichier
+with open(fichier_entree_corrige, 'w', encoding='utf-8') as f_out:
+    f_out.write(contenu)
+
+# Ouvrir le fichier d'entrée corrigé en mode lecture
+with open(fichier_entree_corrige, 'r') as f_in:
+    # Lire les lignes du fichier
+    lignes = f_in.readlines()
 
 # Compteur d'erreurs
 erreurs = 0
-
-# Ouvrir le fichier d'entrée en mode lecture
-with open(fichier_entree, 'r') as f_in:
-    # Lire les lignes du fichier
-    lignes = f_in.readlines()
 
 # Vérifier le format de chaque champ
 for ligne in lignes[1:]:
@@ -133,4 +148,3 @@ with open(fichier_sortie, 'w') as f_out:
 
 # Afficher un message pour indiquer que le processus est terminé
 print("Le fichier a été traité. Les champs mal formatés sont en rouge dans le fichier de sortie HTML.")
-
