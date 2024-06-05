@@ -2,21 +2,48 @@
 
 import re
 
-# Fonction pour vérifier le format du premier champ
+# Fonction pour vérifier le format du premier champ "Numéro"
 def verifier_format_champ1(champ):
-    # Utilisation d'une expression régulière pour vérifier le format
-    if re.match(r'\d+Kg', champ):
+    if re.match(r'^\d{11}$', champ):
         return True
     else:
         return False
 
-# Fonction pour vérifier le format du deuxième champ
+# Fonction pour vérifier le format du deuxième champ "Nom du fabricant"
 def verifier_format_champ2(champ):
-    # Utilisation de str.format() pour vérifier le format
-    if re.match(r'\d+-m', champ):
+    if re.match(r'^NOM_FAB_\d{1,4}$', champ):
         return True
     else:
         return False
+
+# Fonction pour vérifier le format du troisième champ "Référence Fabricant"
+def verifier_format_champ3(champ):
+    if re.match(r'^REF_FAB_\d{1,4}$', champ):
+        return True
+    else:
+        return False
+
+# Fonction pour vérifier le format du 11eme champ "Unité par défaut"
+#def verifier_format_champ12(champ):
+#    if re.match(r'^litre(s)$', champ):
+#        return True
+#    else:
+#        return False
+
+def verifier_format_champ12(champ):
+
+    valeurs_acceptees = [
+        "kilogramme",
+        "kilogramme(s)",
+        "mètre",
+        "mètre(s)",
+        "litre",
+        "litre(s)",
+        "mètre cube",
+        "unité",
+        "unite(s)"
+    ]
+    return champ in valeurs_acceptees
 
 # Nom du fichier d'entrée et de sortie
 fichier_entree = 'export_input.txt'
@@ -38,6 +65,10 @@ for ligne in lignes[1:]:
         if i == 0 and not verifier_format_champ1(champ):
             erreurs += 1
         elif i == 1 and not verifier_format_champ2(champ):
+            erreurs += 1
+        elif i == 2 and not verifier_format_champ3(champ):
+            erreurs += 1
+        elif i == 10 and not verifier_format_champ12(champ):
             erreurs += 1
 
 # Ouvrir le fichier de sortie en mode écriture
@@ -75,6 +106,14 @@ with open(fichier_sortie, 'w') as f_out:
                     champs[j] = '<span style="color:red;">{}</span>'.format(champ)
             elif j == 1:
                 if not verifier_format_champ2(champ):
+                    ligne_erreur = True
+                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+            elif j == 2:
+                if not verifier_format_champ3(champ):
+                    ligne_erreur = True
+                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+            elif j == 10:
+                if not verifier_format_champ12(champ):
                     ligne_erreur = True
                     champs[j] = '<span style="color:red;">{}</span>'.format(champ)
         if ligne_erreur:
