@@ -38,6 +38,14 @@ def verifier_format_champ12(champ):
     ]
     return champ in valeurs_acceptees
 
+# Fonction pour vérifier le format du 29eme champ "Conforme au RoHS"
+def verifier_format_champ30(champ):
+    valeurs_acceptees = [
+        "Oui",
+        "Non"
+    ]
+    return champ in valeurs_acceptees
+
 # Fonction pour vérifier le format du 11eme champ "Température de fonctionnement"
 def verifier_format_champ44(champ):
     # Utilisation d'une expression régulière pour vérifier le format (-xxx/+yyyC)
@@ -99,6 +107,8 @@ for ligne in lignes[1:]:
             erreurs += 1
         elif i == 10 and not verifier_format_champ12(champ):
             erreurs += 1
+        elif i == 29 and not verifier_format_champ30(champ):
+            erreurs += 1
         elif i == 43 and not verifier_format_champ44(champ):
             erreurs += 1
 
@@ -134,23 +144,27 @@ with open(fichier_sortie, 'w') as f_out:
             if j == 0:
                 if not verifier_format_champ1(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
             elif j == 1:
                 if not verifier_format_champ2(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
             elif j == 2:
                 if not verifier_format_champ3(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
             elif j == 10:
                 if not verifier_format_champ12(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+            elif j == 29:
+                if not verifier_format_champ30(champ):
+                    ligne_erreur = True
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
             elif j == 43:
                 if not verifier_format_champ44(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
         if ligne_erreur:
             f_out.write('<tr>')
             f_out.write('<td style="font-weight:bold; color:blue;">{}</td>'.format(i))
