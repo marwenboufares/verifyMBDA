@@ -38,6 +38,15 @@ def verifier_format_champ12(champ):
     ]
     return champ in valeurs_acceptees
 
+# Fonction pour vérifier le format du 11eme champ "Température de fonctionnement"
+def verifier_format_champ44(champ):
+    # Utilisation d'une expression régulière pour vérifier le format (-xxx/+yyyC)
+    if re.match(r'^\(-\d{1,3}/\+\d{1,3}C\)$', champ):
+        return True
+    else:
+        return False
+
+
 # Nom du fichier d'entrée et de sortie
 fichier_entree = 'export_input.txt'
 fichier_entree_corrige = 'export_input_corrige.txt'
@@ -56,9 +65,14 @@ remplacements = [
 with open(fichier_entree, 'r', encoding='utf-8') as f_in:
     contenu = f_in.read()
 
-# Effectuer les remplacements
+# Effectuer les remplacements standards
 for incorrect, correct in remplacements:
     contenu = contenu.replace(incorrect, correct)
+
+# Effectuer les remplacements des formats spécifiques (Température)
+contenu = re.sub(r'\(-\d{1,3}/\+\d{1,3}�C\)', lambda x: x.group(0).replace('�', ''), contenu)
+#champ_43 = re.sub(r'\(-\d{1,3}/\+\d{1,3}�C\)', lambda x: x.group(0).replace('�', ''), champs[43].strip())
+
 
 # Sauvegarder le contenu corrigé dans un nouveau fichier
 with open(fichier_entree_corrige, 'w', encoding='utf-8') as f_out:
@@ -84,6 +98,8 @@ for ligne in lignes[1:]:
         elif i == 2 and not verifier_format_champ3(champ):
             erreurs += 1
         elif i == 10 and not verifier_format_champ12(champ):
+            erreurs += 1
+        elif i == 43 and not verifier_format_champ44(champ):
             erreurs += 1
 
 # Ouvrir le fichier de sortie en mode écriture
@@ -129,6 +145,10 @@ with open(fichier_sortie, 'w') as f_out:
                     champs[j] = '<span style="color:red;">{}</span>'.format(champ)
             elif j == 10:
                 if not verifier_format_champ12(champ):
+                    ligne_erreur = True
+                    champs[j] = '<span style="color:red;">{}</span>'.format(champ)
+            elif j == 43:
+                if not verifier_format_champ44(champ):
                     ligne_erreur = True
                     champs[j] = '<span style="color:red;">{}</span>'.format(champ)
         if ligne_erreur:
