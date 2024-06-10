@@ -23,6 +23,16 @@ def verifier_format_champ3(champ):
     else:
         return False
 
+# Fonction pour vérifier le format du quatrième champ "Nom court Anglais"
+def verifier_format_champ5(champ):
+    valeurs_acceptees = [
+        "ACCESSORIES", "ADHESIVE", "MAGNET", "POWER-SUPPLY", "ROTATION-DAMPERS",
+        "RING", "GUIDE-RING", "SEAL-RING", "BASE-ON-TUBE", "BATTERY",
+        "BEARING", "BOX", "COVER-HOUSING", "TERMINAL-BLOCK", "CONNECTOR CAP",
+        "STOP-RING", "LIFTING-RING", "ELASTIC-RING", "BACKSHELL"
+    ]
+    return champ in valeurs_acceptees
+
 # Fonction pour vérifier le format du 11eme champ "Unité par défaut"
 def verifier_format_champ12(champ):
     valeurs_acceptees = [
@@ -105,6 +115,8 @@ for ligne in lignes[1:]:
             erreurs += 1
         elif i == 2 and not verifier_format_champ3(champ):
             erreurs += 1
+        elif i == 4 and not verifier_format_champ5(champ):
+            erreurs += 1
         elif i == 10 and not verifier_format_champ12(champ):
             erreurs += 1
         elif i == 29 and not verifier_format_champ30(champ):
@@ -151,6 +163,10 @@ with open(fichier_sortie, 'w') as f_out:
                     champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
             elif j == 2:
                 if not verifier_format_champ3(champ):
+                    ligne_erreur = True
+                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+            elif j == 4:
+                if not verifier_format_champ5(champ):
                     ligne_erreur = True
                     champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
             elif j == 10:
