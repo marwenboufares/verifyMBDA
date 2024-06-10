@@ -4,32 +4,25 @@ import re
 
 # Fonction pour vérifier le format du premier champ "Numéro"
 def verifier_format_champ1(champ):
-    if re.match(r'^\d{11}$', champ):
-        return True
-    else:
-        return False
+    return re.match(r'^\d{11}$', champ) is not None
 
 # Fonction pour vérifier le format du deuxième champ "Nom du fabricant"
 def verifier_format_champ2(champ):
-    if re.match(r'^NOM_FAB_\d{1,4}$', champ):
-        return True
-    else:
-        return False
+    return re.match(r'^NOM_FAB_\d{1,4}$', champ) is not None
 
 # Fonction pour vérifier le format du troisième champ "Référence Fabricant"
 def verifier_format_champ3(champ):
-    if re.match(r'^REF_FAB_\d{1,4}$', champ):
-        return True
-    else:
-        return False
+    return re.match(r'^REF_FAB_\d{1,4}$', champ) is not None
 
 # Fonction pour vérifier le format du quatrième champ "Nom court Anglais"
 def verifier_format_champ5(champ):
     valeurs_acceptees = [
         "ACCESSORIES", "ADHESIVE", "MAGNET", "POWER-SUPPLY", "ROTATION-DAMPERS",
         "RING", "GUIDE-RING", "SEAL-RING", "BASE-ON-TUBE", "BATTERY",
-        "BEARING", "BOX", "COVER-HOUSING", "TERMINAL-BLOCK", "CONNECTOR CAP",
-        "STOP-RING", "LIFTING-RING", "ELASTIC-RING", "BACKSHELL"
+        "BEARING", "BOX", "WASHER", "TRANSISTOR", "RESISTOR",
+        "CAPACITOR", "CONNECTOR-HOUSING", "HOOD", "CAP", "CASE",
+        "CONNECTOR", "CONTACT", "DIODE", "SOCKET", "LABEL",
+        "STOP-RING", "WIRE", "ELASTIC-RING", "BACKSHELL"
     ]
     return champ in valeurs_acceptees
 
@@ -50,20 +43,13 @@ def verifier_format_champ12(champ):
 
 # Fonction pour vérifier le format du 29eme champ "Conforme au RoHS"
 def verifier_format_champ30(champ):
-    valeurs_acceptees = [
-        "Oui",
-        "Non"
-    ]
+    valeurs_acceptees = ["Oui", "Non"]
     return champ in valeurs_acceptees
 
 # Fonction pour vérifier le format du 11eme champ "Température de fonctionnement"
 def verifier_format_champ44(champ):
     # Utilisation d'une expression régulière pour vérifier le format (-xxx/+yyyC)
-    if re.match(r'^\(-\d{1,3}/\+\d{1,3}C\)$', champ):
-        return True
-    else:
-        return False
-
+    return re.match(r'^\(-\d{1,3}/\+\d{1,3}C\)$', champ) is not None
 
 # Nom du fichier d'entrée et de sortie
 fichier_entree = 'export_input.txt'
@@ -89,8 +75,6 @@ for incorrect, correct in remplacements:
 
 # Effectuer les remplacements des formats spécifiques (Température)
 contenu = re.sub(r'\(-\d{1,3}/\+\d{1,3}�C\)', lambda x: x.group(0).replace('�', ''), contenu)
-#champ_43 = re.sub(r'\(-\d{1,3}/\+\d{1,3}�C\)', lambda x: x.group(0).replace('�', ''), champs[43].strip())
-
 
 # Sauvegarder le contenu corrigé dans un nouveau fichier
 with open(fichier_entree_corrige, 'w', encoding='utf-8') as f_out:
@@ -125,24 +109,65 @@ for ligne in lignes[1:]:
             erreurs += 1
 
 # Ouvrir le fichier de sortie en mode écriture
-with open(fichier_sortie, 'w') as f_out:
+with open(fichier_sortie, 'w', encoding='utf-8') as f_out:
     # Écrire le début du fichier HTML
-    f_out.write('<!DOCTYPE html>\n<html>\n<head>\n<title>Données formatées</title>\n<style>\ntd { padding: 5px; }\n</style>\n</head>\n<body>\n')
+    f_out.write('''<!DOCTYPE html>
+<html>
+<head>
+<title>Données formatées</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #154c79;
+    color: white;
+}
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+tr:hover {
+    background-color: #ddd;
+}
+.error {
+    color: red;
+    font-weight: bold;
+}
+.success {
+    color: green;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+''')
 
     # Afficher le message d'erreur
     if erreurs == 0:
-        f_out.write('<p style="color:green;">Errors = 0</p>\n')
+        f_out.write('<p class="success">Errors = 0</p>\n')
     else:
-        f_out.write('<p style="color:red;">Errors = {}</p>\n'.format(erreurs))
+        f_out.write('<p class="error">Errors = {}</p>\n'.format(erreurs))
 
     # Commencer le tableau HTML
-    f_out.write('<table border="1">\n')
+    f_out.write('<table>\n')
 
     # Écrire la première ligne (description des champs) en gras et en bleu
     f_out.write('<tr>')
-    f_out.write('<td style="font-weight:bold; color:blue;">Ligne</td>')
+    f_out.write('<th>Ligne</th>')
     for champ in lignes[0].split('|'):
-        f_out.write('<td style="font-weight:bold; color:blue;">{}</td>'.format(champ.strip()))
+        f_out.write('<th>{}</th>'.format(champ.strip()))
     f_out.write('</tr>\n')
 
     # Parcourir chaque ligne du fichier à partir de la deuxième ligne jusqu'à la dernière
@@ -156,40 +181,40 @@ with open(fichier_sortie, 'w') as f_out:
             if j == 0:
                 if not verifier_format_champ1(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 1:
                 if not verifier_format_champ2(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 2:
                 if not verifier_format_champ3(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 4:
                 if not verifier_format_champ5(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 10:
                 if not verifier_format_champ12(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 29:
                 if not verifier_format_champ30(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 43:
                 if not verifier_format_champ44(champ):
                     ligne_erreur = True
-                    champs[j] = '<span style="color:red; font-weight:bold;">{}</span>'.format(champ)
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
         if ligne_erreur:
             f_out.write('<tr>')
-            f_out.write('<td style="font-weight:bold; color:blue;">{}</td>'.format(i))
+            f_out.write('<td>{}</td>'.format(i))
             for champ in champs:
                 f_out.write('<td>{}</td>'.format(champ))
             f_out.write('</tr>\n')
         else:
             f_out.write('<tr>')
-            f_out.write('<td style="font-weight:bold; color:blue;">{}</td>'.format(i))
+            f_out.write('<td>{}</td>'.format(i))
             for champ in champs:
                 f_out.write('<td>{}</td>'.format(champ))
             f_out.write('</tr>\n')
@@ -197,4 +222,4 @@ with open(fichier_sortie, 'w') as f_out:
     f_out.write('</table>\n</body>\n</html>')
 
 # Afficher un message pour indiquer que le processus est terminé
-print("Le fichier a été traité. Les champs mal formatés sont en rouge dans le fichier de sortie HTML.")
+print("Le fichier a été traité. Les champs mal formatés sont en rouge et en gras dans le fichier de sortie HTML.")
