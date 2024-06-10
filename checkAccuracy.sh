@@ -56,13 +56,35 @@ fichier_entree = 'export_input.txt'
 fichier_entree_corrige = 'export_input_corrige.txt'
 fichier_sortie = 'export_output.html'
 
-# Liste des remplacements à effectuer
+# Liste des remplacements à effectuer pour le contenu du fichier
 remplacements = [
     ("unit�", "unite"),
     ("m�tre", "metre"),
     ("contr�l�", "controle"),
     ("Publi�", "Publie")
     # Ajouter d'autres remplacements si nécessaire
+]
+
+# Liste des remplacements à effectuer pour les en-têtes des colonnes
+remplacements_entetes = [
+    ("Numï¿½ro", "Numero"),
+    ("Franï¿½ais", "Francais"),
+    ("Rï¿½fï¿½rence", "Reference"),
+    ("Matiï¿½re", "Matiere"),
+    ("Unitï¿½", "Unite"),
+    ("dï¿½faut", "defaut"),
+    ("contrï¿½le", "controle"),
+    ("appliquï¿½", "applique"),
+    ("Modifiï¿½", "Modifie"),
+    ("rï¿½glementations", "reglementations"),
+    ("Crï¿½ï¿½", "Cree"),
+    ("nï¿½", "numero"),
+    ("etcï¿½", ""),
+    ("Contrï¿½le", "Controle"),
+    ("Rï¿½glementations", "Reglementations"),
+    ("ï¿½", "a"),
+    ("lï¿½exportation", "lexportation"),
+    # Ajouter d'autres remplacements d'en-têtes si nécessaire
 ]
 
 # Lire le contenu du fichier d'entrée
@@ -85,8 +107,15 @@ with open(fichier_entree_corrige, 'r') as f_in:
     # Lire les lignes du fichier
     lignes = f_in.readlines()
 
+# Corriger les en-têtes des colonnes
+en_tetes = lignes[0].split('|')
+for i, en_tete in enumerate(en_tetes):
+    for incorrect, correct in remplacements_entetes:
+        en_tetes[i] = en_tetes[i].replace(incorrect, correct)
+lignes[0] = '|'.join(en_tetes) + '\n'
+
 # Compteur d'erreurs par colonne
-erreurs_par_colonne = [0] * len(lignes[0].split('|'))
+erreurs_par_colonne = [0] * len(en_tetes)
 
 # Vérifier le format de chaque champ
 for ligne in lignes[1:]:
@@ -167,10 +196,9 @@ tr:hover {
     # Tableau des erreurs par colonne
     f_out.write('<table>\n')
     f_out.write('<tr><th>Colonne</th><th>Nombre d\'erreurs</th></tr>\n')
-    noms_colonnes = lignes[0].split('|')
     for i, count in enumerate(erreurs_par_colonne):
         if count > 0:
-            f_out.write('<tr><td>{}</td><td>{}</td></tr>\n'.format(noms_colonnes[i].strip(), count))
+            f_out.write('<tr><td>{}</td><td>{}</td></tr>\n'.format(en_tetes[i].strip(), count))
     f_out.write('</table>\n')
 
     # Commencer le tableau HTML des données
@@ -179,7 +207,7 @@ tr:hover {
     # Écrire la première ligne (description des champs) en gras et en bleu
     f_out.write('<tr>')
     f_out.write('<th>Ligne</th>')
-    for champ in noms_colonnes:
+    for champ in en_tetes:
         f_out.write('<th>{}</th>'.format(champ.strip()))
     f_out.write('</tr>\n')
 
