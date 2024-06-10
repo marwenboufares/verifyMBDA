@@ -46,7 +46,7 @@ def verifier_format_champ30(champ):
     valeurs_acceptees = ["Oui", "Non"]
     return champ in valeurs_acceptees
 
-# Fonction pour vérifier le format du 11eme champ "Température de fonctionnement"
+# Fonction pour vérifier le format du 44eme champ "Température de fonctionnement"
 def verifier_format_champ44(champ):
     # Utilisation d'une expression régulière pour vérifier le format (-xxx/+yyyC)
     return re.match(r'^\(-\d{1,3}/\+\d{1,3}C\)$', champ) is not None
@@ -158,18 +158,28 @@ tr:hover {
 ''')
 
     # Afficher le message d'erreur
-    if sum(erreurs_par_colonne) == 0:
+    total_erreurs = sum(erreurs_par_colonne)
+    if total_erreurs == 0:
         f_out.write('<p class="success">Errors = 0</p>\n')
     else:
-        f_out.write('<p class="error">Errors = {}</p>\n'.format(sum(erreurs_par_colonne)))
+        f_out.write('<p class="error">Errors = {}</p>\n'.format(total_erreurs))
 
-    # Commencer le tableau HTML
+    # Tableau des erreurs par colonne
+    f_out.write('<table>\n')
+    f_out.write('<tr><th>Colonne</th><th>Nombre d\'erreurs</th></tr>\n')
+    noms_colonnes = lignes[0].split('|')
+    for i, count in enumerate(erreurs_par_colonne):
+        if count > 0:
+            f_out.write('<tr><td>{}</td><td>{}</td></tr>\n'.format(noms_colonnes[i].strip(), count))
+    f_out.write('</table>\n')
+
+    # Commencer le tableau HTML des données
     f_out.write('<table>\n')
 
     # Écrire la première ligne (description des champs) en gras et en bleu
     f_out.write('<tr>')
     f_out.write('<th>Ligne</th>')
-    for champ in lignes[0].split('|'):
+    for champ in noms_colonnes:
         f_out.write('<th>{}</th>'.format(champ.strip()))
     f_out.write('</tr>\n')
 
@@ -177,45 +187,34 @@ tr:hover {
     for i, ligne in enumerate(lignes[1:], start=1):
         # Séparer les champs en utilisant le séparateur |
         champs = ligne.split('|')
-        ligne_erreur = False
-        # Vérifier le format de chaque champ
+        # Vérifier le format de chaque champ et surligner les colonnes avec des erreurs
+        f_out.write('<tr>')
+        f_out.write('<td>{}</td>'.format(i))
         for j, champ in enumerate(champs):
             champ = champ.strip()
             if j == 0:
                 if not verifier_format_champ1(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 1:
                 if not verifier_format_champ2(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 2:
                 if not verifier_format_champ3(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 4:
                 if not verifier_format_champ5(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 10:
                 if not verifier_format_champ12(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 29:
                 if not verifier_format_champ30(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 43:
                 if not verifier_format_champ44(champ):
-                    ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
-
-        # Écrire la ligne avec ou sans erreur
-        f_out.write('<tr>')
-        f_out.write('<td>{}</td>'.format(i))
-        for j, champ in enumerate(champs):
-            highlight_class = " highlight" if erreurs_par_colonne[j] > 0 else ""
-            f_out.write('<td class="{}">{}</td>'.format(highlight_class, champ))
+            highlight_class = "highlight" if erreurs_par_colonne[j] > 0 else ""
+            f_out.write('<td class="{}">{}</td>'.format(highlight_class, champs[j]))
         f_out.write('</tr>\n')
 
     # Écrire la fin du fichier HTML
