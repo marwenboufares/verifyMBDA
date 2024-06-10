@@ -85,8 +85,8 @@ with open(fichier_entree_corrige, 'r') as f_in:
     # Lire les lignes du fichier
     lignes = f_in.readlines()
 
-# Compteur d'erreurs
-erreurs = 0
+# Compteur d'erreurs par colonne
+erreurs_par_colonne = [0] * len(lignes[0].split('|'))
 
 # Vérifier le format de chaque champ
 for ligne in lignes[1:]:
@@ -94,19 +94,19 @@ for ligne in lignes[1:]:
     for i, champ in enumerate(champs):
         champ = champ.strip()
         if i == 0 and not verifier_format_champ1(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
         elif i == 1 and not verifier_format_champ2(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
         elif i == 2 and not verifier_format_champ3(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
         elif i == 4 and not verifier_format_champ5(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
         elif i == 10 and not verifier_format_champ12(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
         elif i == 29 and not verifier_format_champ30(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
         elif i == 43 and not verifier_format_champ44(champ):
-            erreurs += 1
+            erreurs_par_colonne[i] += 1
 
 # Ouvrir le fichier de sortie en mode écriture
 with open(fichier_sortie, 'w', encoding='utf-8') as f_out:
@@ -149,16 +149,19 @@ tr:hover {
     color: green;
     font-weight: bold;
 }
+.highlight {
+    background-color: #ffcccb; /* Rouge clair fluorescent */
+}
 </style>
 </head>
 <body>
 ''')
 
     # Afficher le message d'erreur
-    if erreurs == 0:
+    if sum(erreurs_par_colonne) == 0:
         f_out.write('<p class="success">Errors = 0</p>\n')
     else:
-        f_out.write('<p class="error">Errors = {}</p>\n'.format(erreurs))
+        f_out.write('<p class="error">Errors = {}</p>\n'.format(sum(erreurs_par_colonne)))
 
     # Commencer le tableau HTML
     f_out.write('<table>\n')
@@ -206,18 +209,15 @@ tr:hover {
                 if not verifier_format_champ44(champ):
                     ligne_erreur = True
                     champs[j] = '<span class="error">{}</span>'.format(champ)
-        if ligne_erreur:
-            f_out.write('<tr>')
-            f_out.write('<td>{}</td>'.format(i))
-            for champ in champs:
-                f_out.write('<td>{}</td>'.format(champ))
-            f_out.write('</tr>\n')
-        else:
-            f_out.write('<tr>')
-            f_out.write('<td>{}</td>'.format(i))
-            for champ in champs:
-                f_out.write('<td>{}</td>'.format(champ))
-            f_out.write('</tr>\n')
+
+        # Écrire la ligne avec ou sans erreur
+        f_out.write('<tr>')
+        f_out.write('<td>{}</td>'.format(i))
+        for j, champ in enumerate(champs):
+            highlight_class = " highlight" if erreurs_par_colonne[j] > 0 else ""
+            f_out.write('<td class="{}">{}</td>'.format(highlight_class, champ))
+        f_out.write('</tr>\n')
+
     # Écrire la fin du fichier HTML
     f_out.write('</table>\n</body>\n</html>')
 
