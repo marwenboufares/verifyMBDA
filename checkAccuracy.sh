@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import re
 
 # Fonction pour vérifier le format du premier champ "Numéro"
@@ -52,9 +53,9 @@ def verifier_format_champ44(champ):
     return re.match(r'^\(-\d{1,3}/\+\d{1,3}C\)$', champ) is not None
 
 # Nom du fichier d'entrée et de sortie
-fichier_entree = 'export_input.txt'
-fichier_entree_corrige = 'export_input_corrige.txt'
-fichier_sortie = 'export_output.html'
+fichier_entree = 'extract.txt'
+fichier_entree_corrige = 'extract_intermediate.txt'
+fichier_sortie = 'extract_checked.html'
 
 # Liste des remplacements à effectuer pour le contenu du fichier
 remplacements = [
@@ -62,7 +63,6 @@ remplacements = [
     ("m�tre", "metre"),
     ("contr�l�", "controle"),
     ("Publi�", "Publie")
-    # Ajouter d'autres remplacements si nécessaire
 ]
 
 # Liste des remplacements à effectuer pour les en-têtes des colonnes
@@ -82,9 +82,8 @@ remplacements_entetes = [
     ("etcï¿½", ""),
     ("Contrï¿½le", "Controle"),
     ("Rï¿½glementations", "Reglementations"),
-    ("ï¿½", "a"),
+    ("ï¿½", ""),
     ("lï¿½exportation", "lexportation"),
-    # Ajouter d'autres remplacements d'en-têtes si nécessaire
 ]
 
 # Lire le contenu du fichier d'entrée
@@ -137,6 +136,15 @@ for ligne in lignes[1:]:
         elif i == 43 and not verifier_format_champ44(champ):
             erreurs_par_colonne[i] += 1
 
+# Calculer la largeur maximale pour chaque colonne
+largeurs_max = [len(en_tete.strip()) for en_tete in en_tetes]
+for ligne in lignes[1:]:
+    champs = ligne.split('|')
+    for i, champ in enumerate(champs):
+        largeur_champ = len(champ.strip())
+        if largeur_champ > largeurs_max[i]:
+            largeurs_max[i] = largeur_champ
+
 # Ouvrir le fichier de sortie en mode écriture
 with open(fichier_sortie, 'w', encoding='utf-8') as f_out:
     # Écrire le début du fichier HTML
@@ -182,6 +190,18 @@ tr:hover {
     background-color: #ffcccb; /* Rouge clair fluorescent */
 }
 </style>
+<script>
+// Ajuster la largeur des colonnes en fonction du contenu
+function ajusterLargeurColonnes() {
+    var largeursMax = JSON.parse(document.getElementById('largeursMax').textContent);
+    var table = document.getElementById('tableErreursParColonne');
+    var ths = table.getElementsByTagName('th');
+    for (var i = 0; i < ths.length; i++) {
+        ths[i].style.width = largeursMax[i] + 'ch';
+    }
+}
+window.onload = ajusterLargeurColonnes;
+</script>
 </head>
 <body>
 ''')
@@ -193,8 +213,11 @@ tr:hover {
     else:
         f_out.write('<p class="error">Errors = {}</p>\n'.format(total_erreurs))
 
+    # Stocker les largeurs maximales des colonnes en JSON
+    f_out.write('<div id="largeursMax" style="display:none;">{}</div>\n'.format(largeurs_max))
+
     # Tableau des erreurs par colonne
-    f_out.write('<table>\n')
+    f_out.write('<table id="tableErreursParColonne">\n')
     f_out.write('<tr><th>Colonne</th><th>Nombre d\'erreurs</th></tr>\n')
     for i, count in enumerate(erreurs_par_colonne):
         if count > 0:
@@ -247,6 +270,9 @@ tr:hover {
 
     # Écrire la fin du fichier HTML
     f_out.write('</table>\n</body>\n</html>')
+
+# Supprimer le fichier intermédiaire
+os.remove('extract_intermediate.txt')
 
 # Afficher un message pour indiquer que le processus est terminé
 print("Le fichier a été traité. Les champs mal formatés sont en rouge et en gras dans le fichier de sortie HTML.")
