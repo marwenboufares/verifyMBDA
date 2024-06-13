@@ -44,7 +44,7 @@ def verifier_format_champ12(champ):
 
 # Fonction pour vérifier le format du 29eme champ "Conforme au RoHS"
 def verifier_format_champ30(champ):
-    valeurs_acceptees = ["Oui", "Non"]
+    valeurs_acceptees = ["Oui", "Non", ""]
     return champ in valeurs_acceptees
 
 # Fonction pour vérifier le format du 44eme champ "Température de fonctionnement"
@@ -113,28 +113,36 @@ for i, en_tete in enumerate(en_tetes):
         en_tetes[i] = en_tetes[i].replace(incorrect, correct)
 lignes[0] = '|'.join(en_tetes) + '\n'
 
-# Compteur d'erreurs par colonne
+# Compteur d'erreurs par colonne et listes des lignes avec erreurs
 erreurs_par_colonne = [0] * len(en_tetes)
+lignes_erreurs_par_colonne = [[] for _ in range(len(en_tetes))]
 
 # Vérifier le format de chaque champ
-for ligne in lignes[1:]:
+for idx, ligne in enumerate(lignes[1:], start=1):
     champs = ligne.split('|')
     for i, champ in enumerate(champs):
         champ = champ.strip()
         if i == 0 and not verifier_format_champ1(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
         elif i == 1 and not verifier_format_champ2(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
         elif i == 2 and not verifier_format_champ3(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
         elif i == 4 and not verifier_format_champ5(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
         elif i == 10 and not verifier_format_champ12(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
         elif i == 29 and not verifier_format_champ30(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
         elif i == 43 and not verifier_format_champ44(champ):
             erreurs_par_colonne[i] += 1
+            lignes_erreurs_par_colonne[i].append(idx)
 
 # Calculer la largeur maximale pour chaque colonne
 largeurs_max = [len(en_tete.strip()) for en_tete in en_tetes]
@@ -189,19 +197,10 @@ tr:hover {
 .highlight {
     background-color: #ffcccb; /* Rouge clair fluorescent */
 }
-</style>
-<script>
-// Ajuster la largeur des colonnes en fonction du contenu
-function ajusterLargeurColonnes() {
-    var largeursMax = JSON.parse(document.getElementById('largeursMax').textContent);
-    var table = document.getElementById('tableErreursParColonne');
-    var ths = table.getElementsByTagName('th');
-    for (var i = 0; i < ths.length; i++) {
-        ths[i].style.width = largeursMax[i] + 'ch';
-    }
+.fixed-width {
+    width: 5ch; /* Largeur fixe pour la colonne "Nombre d'erreurs" */
 }
-window.onload = ajusterLargeurColonnes;
-</script>
+</style>
 </head>
 <body>
 ''')
@@ -218,10 +217,11 @@ window.onload = ajusterLargeurColonnes;
 
     # Tableau des erreurs par colonne
     f_out.write('<table id="tableErreursParColonne">\n')
-    f_out.write('<tr><th>Colonne</th><th>Nombre d\'erreurs</th></tr>\n')
+    f_out.write('<tr><th>Colonne</th><th class="fixed-width">Nombre d\'erreurs</th><th>Lignes</th></tr>\n')
     for i, count in enumerate(erreurs_par_colonne):
         if count > 0:
-            f_out.write('<tr><td>{}</td><td>{}</td></tr>\n'.format(en_tetes[i].strip(), count))
+            lignes_erreurs = ', '.join(map(str, lignes_erreurs_par_colonne[i]))
+            f_out.write('<tr><td>{}</td><td class="fixed-width">{}</td><td>{}</td></tr>\n'.format(en_tetes[i].strip(), count, lignes_erreurs))
     f_out.write('</table>\n')
 
     # Commencer le tableau HTML des données
