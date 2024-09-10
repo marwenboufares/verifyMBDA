@@ -9,5 +9,17 @@
       "PORTE-LOGIQUE", "INDUCTANCE", "INTERRUPTEUR", "ISOLATEUR", "JOINT-ETANCHEITE", "JOINT", "JOINT-TORIQUE", "BOUCLIER", "CACHE-HUBLOT", "LENTILLE", "LUBRIFICANT",
       "MANCHON", "MANIVELLE", "MANNETTE", "MELANGEUR", "MEMOIRE FLASH", "MICRO-INTERRUPTEUR", "MODULE HUB", "MODULE", "PLANCHE", "PLAQUE-DE-MONTAGE", "PLATINE-TRANSLATION",
       "POIGNEE", "POTENTIOMETRE", "RACCORD ARRIERE", "RACCORD", "RELAIS", "RESISTANCE", "RESSORT", "RONDELLE", "ROTEX", "ROTULE", "ROULEMENT", "CONTACT", "DETENDEUR"
+  ],
+  "champs_kilogramme": [
+    "volume", "capacité", "contenance"
+  ],
+  "champs_litre": [
+    "LUBRIFICANTE", "ADHESIF"
+  ],
+  "champs_metre": [
+    "BRAID", "CABLE", "CABLE-ASSEMBLE"
+  ],
+  "champs_metre_cube": [
+    "volume3d", "espace"
   ]
 }
