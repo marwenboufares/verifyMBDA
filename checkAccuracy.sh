@@ -2,6 +2,11 @@
 
 import os
 import re
+import json
+
+# Charger les valeurs acceptées depuis un fichier JSON
+with open('acceptedValues.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
 
 # Fonction pour vérifier le format du premier champ "Numéro"
 def verifier_format_champ1(champ):
@@ -15,17 +20,15 @@ def verifier_format_champ2(champ):
 def verifier_format_champ3(champ):
     return re.match(r'^REF_FAB_\d{1,4}$', champ) is not None
 
-# Fonction pour vérifier le format du quatrième champ "Nom court Anglais"
-def verifier_format_champ5(champ):
-    valeurs_acceptees = [
-        "ACCESSORIES", "ADHESIVE", "MAGNET", "POWER-SUPPLY", "ROTATION-DAMPERS",
-        "RING", "GUIDE-RING", "SEAL-RING", "BASE-ON-TUBE", "BATTERY",
-        "BEARING", "BOX", "WASHER", "TRANSISTOR", "RESISTOR",
-        "CAPACITOR", "CONNECTOR-HOUSING", "HOOD", "CAP", "CASE",
-        "CONNECTOR", "CONTACT", "DIODE", "SOCKET", "LABEL",
-        "STOP-RING", "WIRE", "ELASTIC-RING", "BACKSHELL"
-    ]
-    return champ in valeurs_acceptees
+# Récupérer les valeurs pour le "Nom court Francais"
+av_nomCourtFrancais = data.get('nomCourtFrancais', [])
+
+# Fonction pour vérifier le format du quatrième champ "Nom court Francais"
+#def verifier_format_champ7(champ):
+    #return champ in av_nomCourtFrancais
+def verifier_format_champ7(champ):
+    return any(val.lower() in champ.lower() for val in av_nomCourtFrancais)
+
 
 # Fonction pour vérifier le format du 11eme champ "Unité par défaut"
 def verifier_format_champ12(champ):
@@ -50,7 +53,7 @@ def verifier_format_champ30(champ):
 # Fonction pour vérifier le format du 44eme champ "Température de fonctionnement"
 def verifier_format_champ44(champ):
     # Utilisation d'une expression régulière pour vérifier le format (-xxx/+yyyC)
-    return re.match(r'^\(-\d{1,3}/\+\d{1,3}C\)$', champ) is not None
+    return re.match(r'^$|^\(?(-\d{1,3}|0)/\+\d{1,3}C\)?$', champ) is not None
 
 # Nom du fichier d'entrée et de sortie
 fichier_entree = 'extract.txt'
@@ -96,6 +99,8 @@ for incorrect, correct in remplacements:
 
 # Effectuer les remplacements des formats spécifiques (Température)
 contenu = re.sub(r'\(-\d{1,3}/\+\d{1,3}�C\)', lambda x: x.group(0).replace('�', ''), contenu)
+contenu = re.sub(r'-\d{1,3}/\+\d{1,3}�C', lambda x: x.group(0).replace('�', ''), contenu)
+
 
 # Sauvegarder le contenu corrigé dans un nouveau fichier
 with open(fichier_entree_corrige, 'w', encoding='utf-8') as f_out:
@@ -131,7 +136,7 @@ for idx, ligne in enumerate(lignes[1:], start=1):
         elif i == 2 and not verifier_format_champ3(champ):
             erreurs_par_colonne[i] += 1
             lignes_erreurs_par_colonne[i].append(idx)
-        elif i == 4 and not verifier_format_champ5(champ):
+        elif i == 6 and not verifier_format_champ7(champ):
             erreurs_par_colonne[i] += 1
             lignes_erreurs_par_colonne[i].append(idx)
         elif i == 10 and not verifier_format_champ12(champ):
@@ -252,8 +257,8 @@ tr:hover {
             elif j == 2:
                 if not verifier_format_champ3(champ):
                     champs[j] = '<span class="error">{}</span>'.format(champ)
-            elif j == 4:
-                if not verifier_format_champ5(champ):
+            elif j == 6:
+                if not verifier_format_champ7(champ):
                     champs[j] = '<span class="error">{}</span>'.format(champ)
             elif j == 10:
                 if not verifier_format_champ12(champ):
