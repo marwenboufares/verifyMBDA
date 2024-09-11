@@ -11,15 +11,70 @@
       "POIGNEE", "POTENTIOMETRE", "RACCORD ARRIERE", "RACCORD", "RELAIS", "RESISTANCE", "RESSORT", "RONDELLE", "ROTEX", "ROTULE", "ROULEMENT", "CONTACT", "DETENDEUR"
   ],
   "champs_kilogramme": [
-    "volume", "capacité", "contenance"
+    "GRAISSE,INORGANIQUE", "RESINE,EPOXY"
   ],
   "champs_litre": [
     "LUBRIFICANTE", "ADHESIF"
   ],
   "champs_metre": [
-    "BRAID", "CABLE", "CABLE-ASSEMBLE"
+    "BRAID", "CABLE", "CABLE-ASSEMBLE", "PRINTER-RIBBON", "PROFIL-STIE"
   ],
   "champs_metre_cube": [
     "volume3d", "espace"
-  ]
+  ],
+  "Level 1":
+  {
+    "18": ["Non connu"],
+    "19": ["USA"],
+    "11": ["Non controle"],
+    "20": ["N.A."],
+    "22": ["EAR99"],
+    "21": ["EAR99"],
+    "23": ["N.A."],
+    "24": ["Non"]
+  },
+  "Level 2":
+  {
+    "18": ["Non connu"],
+    "19": {"exclude": ["USA"]},
+    "11": ["Non controle"],
+    "20": ["N.A."],
+    "22": ["Non controle"],
+    "21": ["N.A."],
+    "23": ["N.A."],
+    "24": ["Non"]
+  },
+  "Level 3":
+  {
+    "18": [ "Valeur1A", "Valeur1B"],
+    "19": ["Valeur1C","Valeur1D"],
+    "11": ["Valeur1E","Valeur1F"],
+    "20": ["Valeur1G","Valeur1H"],
+    "22": ["Valeur1I","Valeur1J"],
+    "21": ["Valeur1K","Valeur1L"],
+    "23": ["Valeur1M","Valeur1N"],
+    "24": ["Valeur1O","Valeur1P"]
+  },
+  "Level 4":
+  {
+    "18": [ "Valeur1A", "Valeur1B"],
+    "19": ["Valeur1C","Valeur1D"],
+    "11": ["Valeur1E","Valeur1F"],
+    "20": ["Valeur1G","Valeur1H"],
+    "22": ["Valeur1I","Valeur1J"],
+    "21": ["Valeur1K","Valeur1L"],
+    "23": ["Valeur1M","Valeur1N"],
+    "24": ["Valeur1O","Valeur1P"]
+  },
+  "Level 5":
+  {
+    "18": [ "Valeur1A", "Valeur1B"],
+    "19": ["Valeur1C","Valeur1D"],
+    "11": ["Valeur1E","Valeur1F"],
+    "20": ["Valeur1G","Valeur1H"],
+    "22": ["Valeur1I","Valeur1J"],
+    "21": ["Valeur1K","Valeur1L"],
+    "23": ["Valeur1M","Valeur1N"],
+    "24": ["Valeur1O","Valeur1P"]
+  }
 }

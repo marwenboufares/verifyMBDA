@@ -35,10 +35,6 @@ av_champs_metre_cube = data.get("champs_metre_cube", [])
 
 # Fonction pour vérifier si une unité est correcte
 def verif_champ_unite(nom_champ, unite):
-    # Convertir en minuscule pour la comparaison
-    #nom_champ = nom_champ.lower()
-    #unite = unite.lower()
-
     # Vérifier la correspondance entre le champ et l'unité
     if nom_champ in av_champs_kilogramme:
         return unite in ["kilogramme", "kilogramme(s)"]
@@ -57,10 +53,21 @@ def verif_champ_conformeRoHs(champ):
     valeurs_acceptees = ["Oui", "Non", ""]
     return champ in valeurs_acceptees
 
+# Fonction pour vérifier le level
+def verif_champ_conformeLevel(champ):
+    valeurs_acceptees = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"]
+    return champ in valeurs_acceptees
+
 # Fonction pour vérifier le format du 44eme champ "Température de fonctionnement"
 def verif_champ_temperature(champ):
     # Utilisation d'une expression régulière pour vérifier le format (-xxx/+yyyC)
     return re.match(r'^$|^\(?(-\d{1,3}|0)/\+\d{1,3}C\)?$', champ) is not None
+
+def verif_champ_avec_exclusion(champ, regle):
+    if isinstance(regle, dict) and "exclude" in regle:
+        return champ not in regle["exclude"]
+    else:
+        return champ in regle
 
 # Nom du fichier d'entrée et de sortie
 fichier_entree = 'extract.txt'
@@ -156,6 +163,23 @@ for idx, ligne in enumerate(lignes[1:], start=1):
         elif i == 29 and not verif_champ_conformeRoHs(champ):
             erreurs_par_colonne[i] += 1
             lignes_erreurs_par_colonne[i].append(idx)
+
+        elif i == 15:
+            if not verif_champ_conformeLevel(champ):
+                erreurs_par_colonne[i] += 1
+                lignes_erreurs_par_colonne[i].append(idx)
+            else:
+                # Obtenir les règles de validation spécifiques au niveau
+                regles_niveau = data.get(champ)
+                if regles_niveau:
+                    colonnes_a_verifier = [18, 19, 11, 20, 22, 21, 23, 24]
+                    for col in colonnes_a_verifier:
+                        valeur_champ = champs[col].strip()
+                        regle = regles_niveau.get(str(col))
+                        if regle and not verif_champ_avec_exclusion(valeur_champ, regle):
+                            erreurs_par_colonne[col] += 1
+                            lignes_erreurs_par_colonne[col].append(idx)
+
         elif i == 43 and not verif_champ_temperature(champ):
             erreurs_par_colonne[i] += 1
             lignes_erreurs_par_colonne[i].append(idx)
@@ -278,6 +302,26 @@ tr:hover {
             elif j == 29:
                 if not verif_champ_conformeRoHs(champ):
                     champs[j] = '<span class="error">{}</span>'.format(champ)
+            elif j == 15:
+                if not verif_champ_conformeLevel(champ):
+                    champs[j] = '<span class="error">{}</span>'.format(champ)
+
+                # Si la colonne 15 a une valeur "Level 1" à "Level 5"
+                level = champs[15].strip()
+                if level in data.keys():
+                    # Définir les indices des colonnes à vérifier en fonction du level
+                    colonnes_a_verifier = [18, 19, 11, 20, 22, 21, 23, 24]
+                    valeurs_attendues = data[level]
+
+                    # Vérifier les valeurs des colonnes spécifiées
+                    for col_idx, valeur_attendue in zip(colonnes_a_verifier, valeurs_attendues):
+                        valeur_champ = champs[col_idx].strip()
+                        if isinstance(valeur_attendue, list):  # Si une liste de valeurs acceptées est définie
+                            if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
+                                champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+                        else:  # Sinon, une valeur exacte est attendue
+                            if valeur_champ != valeur_attendue:
+                                champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
             elif j == 43:
                 if not verif_champ_temperature(champ):
                     champs[j] = '<span class="error">{}</span>'.format(champ)
