@@ -5,8 +5,11 @@ import re
 import json
 
 # Charger les valeurs acceptées depuis un fichier JSON
-with open('acceptedValues.json', 'r', encoding='utf-8') as f:
+#with open('acceptedValues.json', 'r', encoding='utf-8') as f:
+#    data = json.load(f)
+with open('C:/Users/mboufares/Desktop/MBDA/verifyMBDA/acceptedValues.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
+
 
 # Fonction pour vérifier le format du premier champ "Numéro"
 def verif_champ_numero(champ):
@@ -55,7 +58,7 @@ def verif_champ_conformeRoHs(champ):
 
 # Fonction pour vérifier le level
 def verif_champ_conformeLevel(champ):
-    valeurs_acceptees = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"]
+    valeurs_acceptees = ["Level1", "Level2", "Level3", "Level4", "Level5"]
     return champ in valeurs_acceptees
 
 # Fonction pour vérifier le format du 44eme champ "Température de fonctionnement"
@@ -70,9 +73,9 @@ def verif_champ_avec_exclusion(champ, regle):
         return champ in regle
 
 # Nom du fichier d'entrée et de sortie
-fichier_entree = 'extract.txt'
-fichier_entree_corrige = 'extract_intermediate.txt'
-fichier_sortie = 'extract_checked.html'
+fichier_entree = 'C:/Users/mboufares/Desktop/MBDA/verifyMBDA/extract.txt'
+fichier_entree_corrige = 'C:/Users/mboufares/Desktop/MBDA/verifyMBDA/extract_intermediate.txt'
+fichier_sortie = 'C:/Users/mboufares/Desktop/MBDA/verifyMBDA/extract_checked.html'
 
 # Liste des remplacements à effectuer pour le contenu du fichier
 remplacements = [
@@ -174,7 +177,7 @@ for idx, ligne in enumerate(lignes[1:], start=1):
                 if regles_niveau:
                     colonnes_a_verifier = [18, 19, 11, 20, 22, 21, 23, 24]
                     for col in colonnes_a_verifier:
-                        valeur_champ = champs[col].strip()
+                        valeur_champ = champs[col]
                         regle = regles_niveau.get(str(col))
                         if regle and not verif_champ_avec_exclusion(valeur_champ, regle):
                             erreurs_par_colonne[col] += 1
@@ -253,7 +256,7 @@ tr:hover {
         f_out.write('<p class="error">Errors = {}</p>\n'.format(total_erreurs))
 
     # Stocker les largeurs maximales des colonnes en JSON
-    f_out.write('<div id="largeursMax" style="display:none;">{}</div>\n'.format(largeurs_max))
+    f_out.write('<div id="largeursMax" style="display:none;">{}</div>\n'.format(json.dumps(largeurs_max)))
 
     # Tableau des erreurs par colonne
     f_out.write('<table id="tableErreursParColonne">\n')
@@ -306,22 +309,31 @@ tr:hover {
                 if not verif_champ_conformeLevel(champ):
                     champs[j] = '<span class="error">{}</span>'.format(champ)
 
-                # Si la colonne 15 a une valeur "Level 1" à "Level 5"
-                level = champs[15].strip()
-                if level in data.keys():
-                    # Définir les indices des colonnes à vérifier en fonction du level
-                    colonnes_a_verifier = [18, 19, 11, 20, 22, 21, 23, 24]
-                    valeurs_attendues = data[level]
+                # Si la colonne 15 a une valeur "Level1" à "Level5"
+                if len(champs) > 15:
+                    level = champs[15]
+                    if level in data.keys():
+                        # Définir les indices des colonnes à vérifier en fonction du level
+                        colonnes_a_verifier = [18, 19, 11, 20, 22, 21, 23, 24]
+                        valeurs_attendues = data[level]
 
-                    # Vérifier les valeurs des colonnes spécifiées
-                    for col_idx, valeur_attendue in zip(colonnes_a_verifier, valeurs_attendues):
-                        valeur_champ = champs[col_idx].strip()
-                        if isinstance(valeur_attendue, list):  # Si une liste de valeurs acceptées est définie
-                            if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
-                                champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
-                        else:  # Sinon, une valeur exacte est attendue
-                            if valeur_champ != valeur_attendue:
-                                champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+                        # Vérifier les valeurs des colonnes spécifiées
+                        for col_idx in colonnes_a_verifier:
+                            valeur_champ = champs[col_idx].strip()  # Obtenir la valeur du champ dans la colonne actuelle
+
+                            # Récupérer la valeur attendue pour cette colonne dans 'valeurs_attendues'
+                            valeur_attendue = valeurs_attendues.get(str(col_idx), None)  # Assurez-vous que valeurs_attendues est un dict avec les clés des colonnes
+
+                            # Si une liste de valeurs acceptées est définie pour cette colonne
+                            if isinstance(valeur_attendue, list):
+                                if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
+                                    champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+
+                            # Sinon, une valeur exacte est attendue pour cette colonne
+                            elif valeur_attendue is not None:
+                                if valeur_champ != valeur_attendue:
+                                    champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+
             elif j == 43:
                 if not verif_champ_temperature(champ):
                     champs[j] = '<span class="error">{}</span>'.format(champ)
@@ -332,8 +344,11 @@ tr:hover {
     # Écrire la fin du fichier HTML
     f_out.write('</table>\n</body>\n</html>')
 
-# Supprimer le fichier intermédiaire
-os.remove('extract_intermediate.txt')
+# Supprimer le fichier intermédiaire de manière sécurisée
+try:
+    os.remove('extract_intermediate.txt')
+except FileNotFoundError:
+    print("Le fichier 'extract_intermediate.txt' n'existe pas ou a déjà été supprimé.")
 
 # Afficher un message pour indiquer que le processus est terminé
 print("Le fichier a été traité. Les champs mal formatés sont en rouge et en gras dans le fichier de sortie HTML.")

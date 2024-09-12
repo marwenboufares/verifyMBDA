@@ -22,7 +22,7 @@
   "champs_metre_cube": [
     "volume3d", "espace"
   ],
-  "Level 1":
+  "Level1":
   {
     "18": ["Non connu"],
     "19": ["USA"],
@@ -33,7 +33,7 @@
     "23": ["N.A."],
     "24": ["Non"]
   },
-  "Level 2":
+  "Level2":
   {
     "18": ["Non connu"],
     "19": {"exclude": ["USA"]},
@@ -44,7 +44,7 @@
     "23": ["N.A."],
     "24": ["Non"]
   },
-  "Level 3":
+  "Level3":
   {
     "18": [ "Valeur1A", "Valeur1B"],
     "19": ["Valeur1C","Valeur1D"],
@@ -55,7 +55,7 @@
     "23": ["Valeur1M","Valeur1N"],
     "24": ["Valeur1O","Valeur1P"]
   },
-  "Level 4":
+  "Level4":
   {
     "18": [ "Valeur1A", "Valeur1B"],
     "19": ["Valeur1C","Valeur1D"],
@@ -66,7 +66,7 @@
     "23": ["Valeur1M","Valeur1N"],
     "24": ["Valeur1O","Valeur1P"]
   },
-  "Level 5":
+  "Level5":
   {
     "18": [ "Valeur1A", "Valeur1B"],
     "19": ["Valeur1C","Valeur1D"],
