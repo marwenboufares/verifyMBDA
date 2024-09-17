@@ -24,56 +24,56 @@
   ],
   "Level1":
   {
+    "16": ["Non controle"],
     "18": ["Non connu"],
     "19": ["USA"],
-    "11": ["Non controle"],
     "20": ["N.A."],
-    "22": ["EAR99"],
     "21": ["EAR99"],
+    "22": ["EAR99"],
     "23": ["N.A."],
     "24": ["Non"]
   },
   "Level2":
   {
+    "16": ["Non controle"],
     "18": ["Non connu"],
     "19": {"exclude": ["USA"]},
-    "11": ["Non controle"],
     "20": ["N.A."],
-    "22": ["Non controle"],
     "21": ["N.A."],
+    "22": ["Non controle"],
     "23": ["N.A."],
     "24": ["Non"]
   },
   "Level3":
   {
-    "18": [ "Valeur1A", "Valeur1B"],
+    "16": ["Valeur1E","Valeur1F"],
+    "18": ["Valeur1A", "Valeur1B"],
     "19": ["Valeur1C","Valeur1D"],
-    "11": ["Valeur1E","Valeur1F"],
     "20": ["Valeur1G","Valeur1H"],
-    "22": ["Valeur1I","Valeur1J"],
     "21": ["Valeur1K","Valeur1L"],
+    "22": ["Valeur1I","Valeur1J"],
     "23": ["Valeur1M","Valeur1N"],
     "24": ["Valeur1O","Valeur1P"]
   },
   "Level4":
   {
-    "18": [ "Valeur1A", "Valeur1B"],
+    "16": ["Valeur1E","Valeur1F"],
+    "18": ["Valeur1A", "Valeur1B"],
     "19": ["Valeur1C","Valeur1D"],
-    "11": ["Valeur1E","Valeur1F"],
     "20": ["Valeur1G","Valeur1H"],
-    "22": ["Valeur1I","Valeur1J"],
     "21": ["Valeur1K","Valeur1L"],
+    "22": ["Valeur1I","Valeur1J"],
     "23": ["Valeur1M","Valeur1N"],
     "24": ["Valeur1O","Valeur1P"]
   },
   "Level5":
   {
-    "18": [ "Valeur1A", "Valeur1B"],
+    "16": ["Valeur1E","Valeur1F"],
+    "18": ["Valeur1A", "Valeur1B"],
     "19": ["Valeur1C","Valeur1D"],
-    "11": ["Valeur1E","Valeur1F"],
     "20": ["Valeur1G","Valeur1H"],
-    "22": ["Valeur1I","Valeur1J"],
     "21": ["Valeur1K","Valeur1L"],
+    "22": ["Valeur1I","Valeur1J"],
     "23": ["Valeur1M","Valeur1N"],
     "24": ["Valeur1O","Valeur1P"]
   }
