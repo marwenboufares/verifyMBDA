@@ -4,9 +4,7 @@ import os
 import re
 import json
 
-# Charger les valeurs acceptées depuis un fichier JSON
-#with open('acceptedValues.json', 'r', encoding='utf-8') as f:
-#    data = json.load(f)
+# Charger les valeurs acceptées depuis le fichier JSON
 with open('C:/Users/mboufares/Desktop/MBDA/verifyMBDA/acceptedValues.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
@@ -192,12 +190,13 @@ for idx, ligne in enumerate(lignes[1:], start=1):
                     erreurs_par_colonne[col] += 1
                     lignes_erreurs_par_colonne[col].append(idx)
             else:
-                for col in colonnes_a_verifier:
-                    valeur_champ = champs[col]
-                    regle = regles_niveau.get(str(col))
-                    if regle and not verif_champ_avec_exclusion(valeur_champ, regle):
-                        erreurs_par_colonne[col] += 1
-                        lignes_erreurs_par_colonne[col].append(idx)
+                if champ == "Level1" or champ == "Level2":
+                    for col in colonnes_a_verifier:
+                        valeur_champ = champs[col]
+                        regle = regles_niveau.get(str(col))
+                        if regle and not verif_champ_avec_exclusion(valeur_champ, regle):
+                            erreurs_par_colonne[col] += 1
+                            lignes_erreurs_par_colonne[col].append(idx)
 
         elif i == 43 and not verif_champ_temperature(champ):
             erreurs_par_colonne[i] += 1
@@ -328,30 +327,31 @@ tr:hover {
                     colonnes_a_verifier = [16, 18, 19, 20, 21, 22, 23, 24]
 
                     if level in data.keys():
-                        valeurs_attendues = data[level]
+                        if level == "Level1" or level == "Level2":
+                            valeurs_attendues = data[level]
 
-                        # Vérifier les valeurs des colonnes spécifiées
-                        for col_idx in colonnes_a_verifier:
-                            if col_idx < len(champs):  # Vérifier si col_idx est un index valide
-                                valeur_champ = champs[col_idx].strip()  # Obtenir la valeur du champ dans la colonne actuelle
+                            # Vérifier les valeurs des colonnes spécifiées
+                            for col_idx in colonnes_a_verifier:
+                                if col_idx < len(champs):  # Vérifier si col_idx est un index valide
+                                    valeur_champ = champs[col_idx].strip()  # Obtenir la valeur du champ dans la colonne actuelle
 
-                                # Récupérer la valeur attendue pour cette colonne dans 'valeurs_attendues'
-                                valeur_attendue = valeurs_attendues.get(str(col_idx), None)
+                                    # Récupérer la valeur attendue pour cette colonne dans 'valeurs_attendues'
+                                    valeur_attendue = valeurs_attendues.get(str(col_idx), None)
 
-                                # Si une liste de valeurs acceptées est définie pour cette colonne
-                                if isinstance(valeur_attendue, list):
-                                    if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
-                                        champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+                                    # Si une liste de valeurs acceptées est définie pour cette colonne
+                                    if isinstance(valeur_attendue, list):
+                                        if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
+                                            champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
 
-                                # Si une règle d'exclusion est définie
-                                elif isinstance(valeur_attendue, dict) and "exclude" in valeur_attendue:
-                                    if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
-                                        champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+                                    # Si une règle d'exclusion est définie
+                                    elif isinstance(valeur_attendue, dict) and "exclude" in valeur_attendue:
+                                        if not verif_champ_avec_exclusion(valeur_champ, valeur_attendue):
+                                            champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
 
-                                # Sinon, une valeur exacte est attendue pour cette colonne
-                                elif valeur_attendue is not None:
-                                    if valeur_champ != valeur_attendue:
-                                        champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
+                                    # Sinon, une valeur exacte est attendue pour cette colonne
+                                    elif valeur_attendue is not None:
+                                        if valeur_champ != valeur_attendue:
+                                            champs[col_idx] = '<span class="error">{}</span>'.format(champs[col_idx])
                     else:
                         for col_idx in colonnes_a_verifier:
                             if col_idx < len(champs):  # Vérifier si col_idx est un index valide
