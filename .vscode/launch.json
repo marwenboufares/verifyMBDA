@@ -13,6 +13,21 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal",
+    },
+    {
+      "name": "Déboguer un fichier VBS",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/votre_fichier.vbs",
+      "runtimeExecutable": "cscript",
+      "runtimeArgs": [
+          "//nologo"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+          "<node_internals>/**"
+      ]
     }
   ]
 }
